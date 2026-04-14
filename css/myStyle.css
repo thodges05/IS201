@@ -1,0 +1,89 @@
+body {
+    background-color: #0b3d2e; /* deep FIFA green */
+    font-family: Arial, sans-serif;
+    color: #ffffff;
+}
+
+/* NAV BAR */
+.nav {
+    background-color: #111;
+    padding: 12px;
+}
+
+.nav a {
+    color: #f4c542; /* gold accent */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* HEADER */
+.header {
+    text-align: center;
+    padding: 30px;
+    background: linear-gradient(90deg, #0b3d2e, #145a32);
+    border-bottom: 3px solid #f4c542;
+}
+
+.header h1 {
+    color: #ffffff;
+    font-size: 42px;
+}
+
+.header p {
+    color: #f4c542;
+    font-size: 18px;
+}
+
+/* SECTIONS */
+.section {
+    background-color: #ffffff;  /* clean contrast blocks */
+    color: #0b3d2e;
+    margin: 20px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+}
+
+.section h2 {
+    color: #145a32;
+    border-left: 5px solid #f4c542;
+    padding-left: 10px;
+}
+
+/* IMAGES */
+img {
+    border-radius: 10px;
+    max-width: 100%;
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    margin: 30px;
+}
+
+.footer a {
+    color: #f4c542;
+    font-weight: bold;
+}
+
+.nav a:visited {
+    color: #f4c542; /* keeps it gold even after clicking */
+}
+
+.nav a:hover {
+    color: #ffffff; /* optional hover effect */
+}
+
+a:link,
+a:visited {
+    color: #f4c542;  /* gold */
+}
+
+a:hover {
+    color: #ffffff;  /* white on hover */
+}
+
+a:active {
+    color: #ffd700;  /* brighter gold when clicking */
+}

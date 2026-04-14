@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐾 BYU Cougar Snake!</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #001F5B;
+    --panel: #002366;
+    --border: #0033A0;
+    --navy: #001F5B;
+    --royal: #0033A0;
+    --white: #FFFFFF;
+    --light-blue: #4A90D9;
+    --gold: #C5A900;
+    --text: #FFFFFF;
+    --muted: #8aaee0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 60%, rgba(74,144,217,0.5) 0%, transparent 100%),
+      radial-gradient(2px 2px at 55% 15%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 80%, rgba(0,51,160,0.6) 0%, transparent 100%),
+      radial-gradient(2px 2px at 90% 40%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 20% 85%, rgba(74,144,217,0.4) 0%, transparent 100%),
+      radial-gradient(2px 2px at 65% 50%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 90%, rgba(74,144,217,0.5) 0%, transparent 100%),
+      radial-gradient(2px 2px at 85% 10%, rgba(255,255,255,0.4) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+    animation: twinkle 4s ease-in-out infinite alternate;
+  }
+
+  @keyframes twinkle {
+    from { opacity: 0.5; }
+    to { opacity: 1; }
+  }
+
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+    animation: floatOrb 8s ease-in-out infinite alternate;
+  }
+  .orb1 { width: 350px; height: 350px; background: rgba(0,51,160,0.4); top: -120px; left: -120px; }
+  .orb2 { width: 280px; height: 280px; background: rgba(74,144,217,0.2); bottom: -80px; right: -80px; animation-delay: -3s; }
+  .orb3 { width: 220px; height: 220px; background: rgba(0,31,91,0.5); top: 40%; left: 40%; animation-delay: -5s; }
+
+  @keyframes floatOrb {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(30px, -20px) scale(1.1); }
+  }
+
+  #title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    margin-bottom: 0.3rem;
+    position: relative;
+    z-index: 1;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, #ffffff 0%, #4A90D9 40%, #ffffff 70%, #C5A900 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 24px rgba(74,144,217,0.7));
+    animation: titlePop 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  #subtitle {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1rem;
+    letter-spacing: 6px;
+    color: var(--light-blue);
+    margin-bottom: 0.8rem;
+    position: relative;
+    z-index: 1;
+    opacity: 0.85;
+  }
+
+  @keyframes titlePop {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  #score-bar {
+    display: flex;
+    gap: 1.2rem;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .score-card {
+    background: rgba(0,35,102,0.8);
+    border: 1px solid rgba(74,144,217,0.4);
+    border-radius: 12px;
+    padding: 8px 20px;
+    text-align: center;
+    min-width: 90px;
+    backdrop-filter: blur(4px);
+  }
+
+  .score-card.bump { animation: bump 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes bump { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
+
+  .score-card label {
+    display: block;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+
+  .score-card .val {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.8rem;
+    line-height: 1;
+    letter-spacing: 1px;
+  }
+
+  #score-card-score .val { color: #ffffff; }
+  #score-card-best .val  { color: #C5A900; }
+  #score-card-level .val { color: #4A90D9; }
+
+  #canvas-wrap {
+    position: relative;
+    border-radius: 16px;
+    z-index: 1;
+    padding: 3px;
+    background: linear-gradient(135deg, #0033A0, #4A90D9, #ffffff, #C5A900, #0033A0);
+    background-size: 400% 400%;
+    animation: borderSpin 5s linear infinite;
+  }
+
+  @keyframes borderSpin {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  #canvas-inner {
+    border-radius: 13px;
+    overflow: hidden;
+    display: block;
+  }
+
+  canvas {
+    display: block;
+    image-rendering: pixelated;
+  }
+
+  #overlay {
+    position: absolute;
+    inset: 3px;
+    border-radius: 13px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(0, 15, 45, 0.92);
+    backdrop-filter: blur(8px);
+    z-index: 10;
+    transition: opacity 0.3s;
+  }
+
+  #overlay.hidden { opacity: 0; pointer-events: none; }
+
+  .overlay-icon {
+    font-size: 3rem;
+    animation: bounceIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  @keyframes bounceIn {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  #overlay h2 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2rem;
+    letter-spacing: 3px;
+    background: linear-gradient(90deg, #ffffff, #4A90D9, #C5A900);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  #overlay-sub {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    max-width: 240px;
+    line-height: 1.6;
+  }
+
+  #ate-line {
+    font-size: 1.1rem;
+    min-height: 28px;
+    text-align: center;
+  }
+
+  #start-btn {
+    margin-top: 6px;
+    padding: 12px 36px;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    color: #001F5B;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #ffffff, #4A90D9);
+    box-shadow: 0 4px 20px rgba(74,144,217,0.5);
+    transition: transform 0.12s, box-shadow 0.12s;
+  }
+
+  #start-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 30px rgba(74,144,217,0.7);
+  }
+
+  #start-btn:active { transform: scale(0.97); }
+
+  #mobile-controls {
+    display: grid;
+    grid-template-columns: repeat(3, 44px);
+    grid-template-rows: repeat(2, 44px);
+    gap: 6px;
+    margin-top: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .dpad {
+    background: rgba(0,35,102,0.8);
+    border: 1px solid rgba(74,144,217,0.4);
+    border-radius: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    user-select: none;
+    transition: background 0.1s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .dpad:active { background: rgba(0,51,160,0.9); transform: scale(0.9); }
+  #btn-up    { grid-column: 2; grid-row: 1; }
+  #btn-left  { grid-column: 1; grid-row: 2; }
+  #btn-down  { grid-column: 2; grid-row: 2; }
+  #btn-right { grid-column: 3; grid-row: 2; }
+
+  .eat-popup {
+    position: absolute;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    pointer-events: none;
+    z-index: 20;
+    animation: popUp 0.9s ease-out forwards;
+    white-space: nowrap;
+    text-shadow: 0 0 10px currentColor;
+  }
+
+  @keyframes popUp {
+    0%   { transform: translateY(0) scale(1); opacity: 1; }
+    80%  { transform: translateY(-45px) scale(1.15); opacity: 1; }
+    100% { transform: translateY(-58px) scale(0.9); opacity: 0; }
+  }
+
+  #go-cougs {
+    font-family: 'Bebas Neue', cursive;
+    letter-spacing: 4px;
+    font-size: 0.85rem;
+    color: rgba(74,144,217,0.6);
+    margin-top: 8px;
+    position: relative;
+    z-index: 1;
+  }
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div id="title">🐾 BYU Cougar Snake</div>
+<div id="subtitle">Rise &amp; Shout</div>
+
+<div id="score-bar">
+  <div class="score-card" id="score-card-score">
+    <label>Score</label>
+    <div class="val" id="score-val">0</div>
+  </div>
+  <div class="score-card" id="score-card-best">
+    <label>Best</label>
+    <div class="val" id="best-val">0</div>
+  </div>
+  <div class="score-card" id="score-card-level">
+    <label>Level</label>
+    <div class="val" id="level-val">1</div>
+  </div>
+</div>
+
+<div id="canvas-wrap">
+  <div id="canvas-inner">
+    <canvas id="gc" width="380" height="380"></canvas>
+  </div>
+  <div id="overlay">
+    <div class="overlay-icon" id="overlay-icon">🐾</div>
+    <h2 id="overlay-title">BYU Cougar Snake!</h2>
+    <div id="ate-line"></div>
+    <div id="overlay-sub">Arrow keys or WASD to slither.<br>Eat the BYU goodies. Go Cougars!</div>
+    <button id="start-btn">▶ START GAME</button>
+  </div>
+</div>
+
+<div id="mobile-controls">
+  <button class="dpad" id="btn-up">↑</button>
+  <button class="dpad" id="btn-left">←</button>
+  <button class="dpad" id="btn-down">↓</button>
+  <button class="dpad" id="btn-right">→</button>
+</div>
+
+<div id="go-cougs">⚡ GO COUGARS ⚡</div>
+
+<script>
+  const canvas   = document.getElementById('gc');
+  const ctx      = canvas.getContext('2d');
+  const COLS     = 19, ROWS = 19, CELL = 20;
+  const overlay  = document.getElementById('overlay');
+  const oTitle   = document.getElementById('overlay-title');
+  const oSub     = document.getElementById('overlay-sub');
+  const oIcon    = document.getElementById('overlay-icon');
+  const ateLine  = document.getElementById('ate-line');
+  const startBtn = document.getElementById('start-btn');
+  const scoreEl  = document.getElementById('score-val');
+  const bestEl   = document.getElementById('best-val');
+  const levelEl  = document.getElementById('level-val');
+  const scoreCard = document.getElementById('score-card-score');
+
+  // BYU-themed foods!
+  const FOODS = [
+    { e:'🏈', pts:3, color:'#C5A900', label:'football' },
+    { e:'🎓', pts:4, color:'#ffffff', label:'diploma'  },
+    { e:'🐾', pts:2, color:'#4A90D9', label:'paw'      },
+    { e:'📘', pts:1, color:'#4A90D9', label:'book'     },
+    { e:'🏆', pts:5, color:'#C5A900', label:'trophy'   },
+    { e:'🎽', pts:2, color:'#ffffff', label:'jersey'   },
+    { e:'⭐', pts:3, color:'#C5A900', label:'star'     },
+    { e:'🎯', pts:2, color:'#4A90D9', label:'bullseye' },
+    { e:'🦁', pts:4, color:'#C5A900', label:'cougar'   },
+    { e:'🏀', pts:2, color:'#fb923c', label:'bball'    },
+    { e:'🎪', pts:1, color:'#ffffff', label:'pennant'  },
+    { e:'💙', pts:1, color:'#4A90D9', label:'heart'    },
+    { e:'🥇', pts:5, color:'#C5A900', label:'gold'     },
+    { e:'📣', pts:2, color:'#ffffff', label:'cheer'    },
+    { e:'🌟', pts:3, color:'#C5A900', label:'star2'    },
+  ];
+
+  // BYU navy/royal/white snake body
+  const BODY_COLORS = [
+    '#0033A0','#1a4fc4','#2b5fd4','#0033A0','#1a4fc4',
+    '#2b5fd4','#0033A0','#1a4fc4','#2b5fd4','#0033A0',
+  ];
+  const HEAD_COLOR = '#4A90D9';
+
+  let snake, dir, nextDir, food, score, best = 0, running = false, gameLoop, ateLog;
+  let particles = [];
+
+  function randomFood() {
+    const roll = Math.random();
+    if (roll < 0.06) return FOODS[4];  // trophy rare
+    if (roll < 0.12) return FOODS[12]; // gold medal rare
+    return FOODS[Math.floor(Math.random() * FOODS.length)];
+  }
+
+  function spawnFood() {
+    let pos;
+    do {
+      pos = { x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * ROWS) };
+    } while (snake.some(s => s.x === pos.x && s.y === pos.y));
+    food = { ...pos, ...randomFood() };
+  }
+
+  function initGame() {
+    const mx = Math.floor(COLS / 2), my = Math.floor(ROWS / 2);
+    snake = [
+      { x: mx,     y: my },
+      { x: mx - 1, y: my },
+      { x: mx - 2, y: my },
+      { x: mx - 3, y: my },
+    ];
+    dir = { x: 1, y: 0 };
+    nextDir = { x: 1, y: 0 };
+    score = 0; ateLog = []; particles = [];
+    scoreEl.textContent = 0;
+    levelEl.textContent = 1;
+    spawnFood();
+  }
+
+  function getLevel() { return Math.floor(score / 8) + 1; }
+  function getSpeed() { return Math.max(55, 195 - getLevel() * 18); }
+
+  function spawnParticles(x, y, color) {
+    for (let i = 0; i < 16; i++) {
+      const angle = (Math.PI * 2 * i) / 16;
+      const speed = 1.5 + Math.random() * 3.5;
+      particles.push({
+        x: x * CELL + CELL / 2,
+        y: y * CELL + CELL / 2,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1, color,
+        size: 2 + Math.random() * 4,
+        shape: Math.random() < 0.4 ? 'star' : 'circle',
+      });
+    }
+  }
+
+  function drawStar(x, y, r) {
+    ctx.beginPath();
+    for (let i = 0; i < 5; i++) {
+      const a = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+      const b = a + (2 * Math.PI) / 5;
+      if (i === 0) ctx.moveTo(x + r * Math.cos(a), y + r * Math.sin(a));
+      else ctx.lineTo(x + r * Math.cos(a), y + r * Math.sin(a));
+      ctx.lineTo(x + (r/2) * Math.cos(b), y + (r/2) * Math.sin(b));
+    }
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function updateParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx; p.y += p.vy;
+      p.vy += 0.12;
+      p.life -= 0.035;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+  }
+
+  function drawParticles() {
+    particles.forEach(p => {
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.color;
+      if (p.shape === 'star') drawStar(p.x, p.y, p.size);
+      else { ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill(); }
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  function spawnPopup(x, y, f) {
+    const wrap = document.getElementById('canvas-wrap');
+    const el = document.createElement('div');
+    el.className = 'eat-popup';
+    el.style.color = f.color;
+    el.style.left = (3 + x * CELL + CELL / 2) + 'px';
+    el.style.top  = (3 + y * CELL) + 'px';
+    el.style.transform = 'translateX(-50%)';
+    el.textContent = '+' + f.pts + ' ' + f.e;
+    wrap.appendChild(el);
+    setTimeout(() => el.remove(), 950);
+  }
+
+  const BG_COLOR   = '#000d2e';
+  const GRID_COLOR = '#001040';
+
+  function drawBg() {
+    ctx.fillStyle = BG_COLOR;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Subtle Y logo watermark
+    ctx.save();
+    ctx.font = 'bold 160px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'rgba(0,51,160,0.07)';
+    ctx.fillText('Y', canvas.width / 2, canvas.height / 2);
+    ctx.restore();
+
+    // Grid
+    ctx.strokeStyle = GRID_COLOR;
+    ctx.lineWidth = 0.5;
+    for (let x = 0; x <= COLS; x++) {
+      ctx.beginPath(); ctx.moveTo(x*CELL,0); ctx.lineTo(x*CELL,ROWS*CELL); ctx.stroke();
+    }
+    for (let y = 0; y <= ROWS; y++) {
+      ctx.beginPath(); ctx.moveTo(0,y*CELL); ctx.lineTo(COLS*CELL,y*CELL); ctx.stroke();
+    }
+  }
+
+  function drawFood() {
+    const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 280);
+    const px = food.x * CELL, py = food.y * CELL;
+
+    // Glow halo
+    ctx.save();
+    ctx.shadowColor = food.color;
+    ctx.shadowBlur = 16 + 12 * pulse;
+    ctx.font = (CELL - 1) + 'px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(food.e, px + CELL / 2, py + CELL / 2 + 1);
+    ctx.restore();
+
+    // Pulse ring
+    ctx.strokeStyle = food.color;
+    ctx.globalAlpha = 0.2 + 0.3 * pulse;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(px + 1, py + 1, CELL - 2, CELL - 2, 5);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  function drawSnake() {
+    const len = snake.length;
+    snake.slice().reverse().forEach((seg, ri) => {
+      const i = len - 1 - ri;
+      const isHead = i === 0;
+      const px = seg.x * CELL, py = seg.y * CELL;
+
+      if (isHead) {
+        // Glow
+        ctx.save();
+        ctx.shadowColor = HEAD_COLOR;
+        ctx.shadowBlur = 14;
+        ctx.fillStyle = HEAD_COLOR;
+        ctx.beginPath();
+        ctx.roundRect(px + 1, py + 1, CELL - 2, CELL - 2, 8);
+        ctx.fill();
+        ctx.restore();
+
+        // Highlight stripe (jersey-like)
+        ctx.fillStyle = 'rgba(255,255,255,0.2)';
+        ctx.beginPath();
+        ctx.roundRect(px + 3, py + 3, CELL - 6, 5, 2);
+        ctx.fill();
+
+        // Eyes
+        const ex1 = dir.x === 1 ? px+14 : dir.x === -1 ? px+5 : px+6;
+        const ex2 = dir.x === 1 ? px+14 : dir.x === -1 ? px+5 : px+13;
+        const ey1 = dir.y === 1 ? py+14 : dir.y === -1 ? py+5 : py+6;
+        const ey2 = dir.y === 0 ? py+13 : ey1;
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(ex1, ey1, 2.5, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(ex2, ey2, 2.5, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#001F5B';
+        ctx.beginPath(); ctx.arc(ex1, ey1, 1.2, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(ex2, ey2, 1.2, 0, Math.PI*2); ctx.fill();
+
+      } else {
+        const t = i / (len - 1);
+        ctx.fillStyle = BODY_COLORS[i % BODY_COLORS.length];
+        ctx.globalAlpha = 0.9 - t * 0.2;
+        ctx.beginPath();
+        ctx.roundRect(px + 2, py + 2, CELL - 4, CELL - 4, Math.max(2, 5 - t * 2));
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        // White jersey stripe every other segment
+        if (i % 2 === 0) {
+          ctx.fillStyle = 'rgba(255,255,255,0.12)';
+          ctx.beginPath();
+          ctx.roundRect(px + 4, py + 4, CELL - 8, 4, 1);
+          ctx.fill();
+        }
+      }
+    });
+  }
+
+  function render() {
+    drawBg();
+    updateParticles();
+    drawParticles();
+    drawFood();
+    drawSnake();
+  }
+
+  function step() {
+    dir = { ...nextDir };
+    const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+    if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) { endGame('wall'); return; }
+    if (snake.some(s => s.x === head.x && s.y === head.y))             { endGame('self'); return; }
+    snake.unshift(head);
+    if (head.x === food.x && head.y === food.y) {
+      score += food.pts;
+      scoreEl.textContent = score;
+      if (score > best) { best = score; bestEl.textContent = best; }
+      levelEl.textContent = getLevel();
+      ateLog.push(food.e);
+      spawnParticles(head.x, head.y, food.color);
+      spawnPopup(head.x, head.y, food);
+      scoreCard.classList.remove('bump');
+      void scoreCard.offsetWidth;
+      scoreCard.classList.add('bump');
+      spawnFood();
+      clearInterval(gameLoop);
+      gameLoop = setInterval(tick, getSpeed());
+    } else {
+      snake.pop();
+    }
+    render();
+  }
+
+  function tick() { if (running) step(); }
+
+  function startGame() {
+    initGame();
+    running = true;
+    overlay.classList.add('hidden');
+    clearInterval(gameLoop);
+    gameLoop = setInterval(tick, getSpeed());
+    render();
+  }
+
+  const PHRASES_WALL = [
+    'Out of bounds! 🏈',
+    'The ref called it!',
+    'Hit the boundary!',
+    'Stay in the field!',
+  ];
+  const PHRASES_SELF = [
+    'You tackled yourself! 😵',
+    'Own-team penalty!',
+    'Cougar bit its tail!',
+    'Roughing yourself! 😂',
+  ];
+
+  function endGame(reason) {
+    running = false;
+    clearInterval(gameLoop);
+    const last = ateLog.slice(-4).join(' ');
+    const phrases = reason === 'wall' ? PHRASES_WALL : PHRASES_SELF;
+    const msg = phrases[Math.floor(Math.random() * phrases.length)];
+    oIcon.textContent = reason === 'wall' ? '💥' : '😵';
+    oTitle.textContent = msg;
+    ateLine.textContent = ateLog.length ? 'You collected: ' + last : '';
+    oSub.innerHTML =
+      'Score: <b style="color:#4A90D9">' + score + '</b> &nbsp;|&nbsp; Level ' + getLevel() +
+      '<br><span style="color:#C5A900">Rise and Shout, the Cougars are out!</span>';
+    startBtn.textContent = '▶ PLAY AGAIN';
+    overlay.classList.remove('hidden');
+  }
+
+  const KEYS = {
+    ArrowUp:   {x:0,y:-1}, ArrowDown: {x:0,y:1},
+    ArrowLeft: {x:-1,y:0}, ArrowRight:{x:1,y:0},
+    w:{x:0,y:-1}, s:{x:0,y:1}, a:{x:-1,y:0}, d:{x:1,y:0},
+  };
+
+  document.addEventListener('keydown', e => {
+    if (!running) return;
+    const nd = KEYS[e.key];
+    if (nd && !(nd.x === -dir.x && nd.y === -dir.y)) { nextDir = nd; e.preventDefault(); }
+  });
+
+  function setDir(nd) {
+    if (!running) return;
+    if (!(nd.x === -dir.x && nd.y === -dir.y)) nextDir = nd;
+  }
+
+  document.getElementById('btn-up').addEventListener('click',    () => setDir({x:0,  y:-1}));
+  document.getElementById('btn-down').addEventListener('click',  () => setDir({x:0,  y:1 }));
+  document.getElementById('btn-left').addEventListener('click',  () => setDir({x:-1, y:0 }));
+  document.getElementById('btn-right').addEventListener('click', () => setDir({x:1,  y:0 }));
+  startBtn.addEventListener('click', startGame);
+
+  initGame();
+  function idleLoop() { if (!running) render(); requestAnimationFrame(idleLoop); }
+  idleLoop();
+</script>
+</body>
+</html>
